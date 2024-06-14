@@ -1,15 +1,10 @@
-import 'dart:typed_data';
-import 'dart:ui';
-import 'dart:io' as io;
-
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gap/gap.dart';
 import 'package:gengr/gen/assets.gen.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:gengr/services/adaptive_file/adaptive_file.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -33,6 +28,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text(
+              "GEN QR",
+              style: Theme.of(context).textTheme.headlineLarge,
+              textAlign: TextAlign.center,
+            ),
+            Gap(12),
+
             /// form
             Container(
               constraints: BoxConstraints(maxWidth: 800),
@@ -143,7 +145,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   onChanged(String v) {
-    if (v.isEmpty) return;
+    setState(() {
+      data = v.isEmpty ? null : v;
+    });
   }
 
   onFieldSubmitted(String v) {
@@ -160,9 +164,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     final qrImage = QrImage(qrCode);
-    final qrImageBytes = await qrImage.toImageAsBytes(
+
+    await qrImage.exportAsImage(
+      context,
       size: 512,
-      format: ImageByteFormat.png,
       decoration: PrettyQrDecoration(
         image: image == null
             ? null
@@ -171,19 +176,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
       ),
     );
-    if (qrImageBytes == null) return;
-    final buffer = qrImageBytes.buffer;
-    if (kIsWeb) {
-    } else {
-      String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: 'Please select an output file:',
-        fileName: 'download.png',
-      );
-      if (outputFile == null) return;
-
-      final res = await io.File(outputFile).writeAsBytes(buffer.asUint8List(
-          qrImageBytes.offsetInBytes, qrImageBytes.lengthInBytes));
-    }
   }
 }
 
