@@ -102,7 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             /// preview and download
             if (data != null)
               Container(
-                constraints: BoxConstraints(maxWidth: 200),
+                constraints: BoxConstraints(maxWidth: 170),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
